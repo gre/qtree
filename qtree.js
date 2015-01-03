@@ -1,21 +1,21 @@
 function QuadTree(x, y, w, h, options) {
 
-    if( typeof x != 'number' || isNaN(x) )
+    if( typeof x !== 'number' || isNaN(x) )
         x = 0;
-    if( typeof y != 'number' || isNaN(y) )
+    if( typeof y !== 'number' || isNaN(y) )
         y = 0;
-    if( typeof w != 'number' || isNaN(w) )
+    if( typeof w !== 'number' || isNaN(w) )
         w = 10;
-    if( typeof h != 'number' || isNaN(h) )
+    if( typeof h !== 'number' || isNaN(h) )
         h = 10;
     
     var maxc = 25;
     var leafratio = 0.5;
     if( options ) {
-        if( typeof options.maxchildren == 'number' )
+        if( typeof options.maxchildren === 'number' )
             if( options.maxchildren > 0 )
                 maxc = options.maxchildren;
-        if( typeof options.leafratio == 'number' )
+        if( typeof options.leafratio === 'number' )
             if( options.leafratio >= 0 )
                 leafratio = options.leafratio;
     }
@@ -24,10 +24,10 @@ function QuadTree(x, y, w, h, options) {
     function validate(obj) {
         if( !obj )
             return false;
-        if( typeof obj.x != 'number' ||
-            typeof obj.y != 'number' ||
-            typeof obj.w != 'number' ||
-            typeof obj.h != 'number' )
+        if( typeof obj.x !== 'number' ||
+            typeof obj.y !== 'number' ||
+            typeof obj.w !== 'number' ||
+            typeof obj.h !== 'number' )
             return false;
         if( isNaN(obj.x) || isNaN(obj.y) ||
             isNaN(obj.w) || isNaN(obj.h) )
@@ -37,10 +37,10 @@ function QuadTree(x, y, w, h, options) {
 
     // test for deep equality for x,y,w,h
     function isequal(o1, o2) {
-        if( o1.x == o2.x &&
-            o1.y == o2.y &&
-            o1.w == o2.w &&
-            o1.h == o2.h )
+        if( o1.x === o2.x &&
+            o1.y === o2.y &&
+            o1.w === o2.w &&
+            o1.h === o2.h )
             return true;
         return false;
     }
@@ -55,7 +55,7 @@ function QuadTree(x, y, w, h, options) {
             c: [],
             l: [],
             n: []
-        }
+        };
     }
 
     // root node used by this quadtree
@@ -76,14 +76,16 @@ function QuadTree(x, y, w, h, options) {
         // x * dy1 - y * dx1 = x1 * dy1 - y1 * dx1 + 
         //                     t * ( dy1 * dy1 + dx1 * dx1 )
         var t = dx1 * dx1 + dy1 * dy1;
-        if( t == 0 )
+        if( t === 0 )
             return null;
         else {
             t = ( x * dy1 - y * dx1 - x1 * dy1 + y1 * dx1 ) / t;
+            var dist, s;
+
             if( Math.abs(dx1) > Math.abs(dy1) )
-                var s = ( x - x1 - t * dy1 ) / dx1;
+                s = ( x - x1 - t * dy1 ) / dx1;
             else
-                var s = ( y - y1 + t * dx1 ) / dy1;
+                s = ( y - y1 + t * dx1 ) / dy1;
             if( ( s >= 0 && s <= len1 ) || len1 < 0 )
                 return {
                     s: s,
@@ -93,15 +95,13 @@ function QuadTree(x, y, w, h, options) {
                     dist: Math.abs(t)
                 };
             else if( s < 0 ) { 
-                var dist = distance(x, y, x1, y1);
+                dist = distance(x, y, x1, y1);
                 return {
                     s: s,
                     dist: dist
                 };
             } else {
-                var dist = distance(x, y,
-                                    x1 + len1*dx1, 
-                                    y1 + len1*dy1);
+                dist = distance(x, y, x1 + len1*dx1, y1 + len1*dy1);
                 return {
                     s: s,
                     dist: dist
@@ -183,20 +183,20 @@ function QuadTree(x, y, w, h, options) {
 
         if( !attr )
             attr = false;
-        else if( typeof attr != 'string' )
+        else if( typeof attr !== 'string' )
             attr = 'id';
 
-        var count = 0;
-        for( var ci = 0; ci < node.c.length; ci++ )
-            if( ( attr && node.c[ci][attr] == obj[attr] ) ||
+        var ci, count = 0;
+        for(ci = 0; ci < node.c.length; ci++ )
+            if( ( attr && node.c[ci][attr] === obj[attr] ) ||
                 ( !attr && isequal(node.c[ci], obj) ) ) {
                 count++;
                 node.c.splice(ci, 1);
                 ci--;
             }
 
-        for( var ci = 0; ci < node.l.length; ci++ )
-            if( ( attr && node.l[ci][attr] == obj[attr] ) ||
+        for(ci = 0; ci < node.l.length; ci++ )
+            if( ( attr && node.l[ci][attr] === obj[attr] ) ||
                 ( !attr && isequal(node.l[ci], obj) ) ) {
                 count++;
                 node.l.splice(ci, 1);
@@ -215,7 +215,7 @@ function QuadTree(x, y, w, h, options) {
         if( !validate(obj) )
             return;
 
-        if( node.n.length == 0 ) {
+        if( node.n.length === 0 ) {
             node.c.push(obj);
             
             // subdivide
@@ -237,11 +237,12 @@ function QuadTree(x, y, w, h, options) {
     // iterate through all objects in this node matching given overlap
     // function
     function getter(overlapfun, node, obj, buf, strict, callback) {
-        for( var li = 0; li < node.l.length; li++ )
+        var li;
+        for( li = 0; li < node.l.length; li++ )
             if( !strict || overlapfun(obj, node.l[li], buf) )
                 if( !callback(node.l[li]) )
                     return false;
-        for( var li = 0; li < node.c.length; li++ )
+        for( li = 0; li < node.c.length; li++ )
             if( !strict || overlapfun(obj, node.c[li], buf) )
                 if( !callback(node.c[li]) )
                     return false;
@@ -269,21 +270,21 @@ function QuadTree(x, y, w, h, options) {
     // geometry, either a rectangle or a line segment
     function get(node, obj, buf, callback) {
 
-        if( typeof buf == 'function' && typeof callback == 'undefined' ) {
+        if( typeof buf === 'function' && typeof callback === 'undefined' ) {
             callback = buf;
             buf = 0;
         }
-        if( obj == null )
+        if( obj === null )
             get_rect(node, obj, buf, callback);
-        else if( typeof obj.x == 'number' &&
-                 typeof obj.y == 'number' &&
+        else if( typeof obj.x === 'number' &&
+                 typeof obj.y === 'number' &&
                  !isNaN(obj.x) && !isNaN(obj.y) ) {
-            if( typeof obj.dx == 'number' &&
-                typeof obj.dy == 'number' &&
+            if( typeof obj.dx === 'number' &&
+                typeof obj.dy === 'number' &&
                 !isNaN(obj.dx) && !isNaN(obj.dy) )
                 get_line(node, obj, buf, callback);
-            else if( typeof obj.w == 'number' &&
-                     typeof obj.h == 'number' &&
+            else if( typeof obj.w === 'number' &&
+                     typeof obj.h === 'number' &&
                      !isNaN(obj.w) && !isNaN(obj.h) )
                 get_rect(node, obj, buf, callback);
         }
@@ -316,7 +317,7 @@ function QuadTree(x, y, w, h, options) {
             }
         },
         parse: function(str) {
-            if( typeof str == 'string' )
+            if( typeof str === 'string' )
                 str = JSON.parse(str);
             
             x = str.x;
@@ -331,5 +332,5 @@ function QuadTree(x, y, w, h, options) {
 }
 
 // for use within node.js
-if( typeof module != 'undefined' )
+if( typeof module !== 'undefined' )
     module.exports = QuadTree;
